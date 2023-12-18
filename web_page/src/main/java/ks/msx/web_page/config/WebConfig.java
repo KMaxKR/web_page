@@ -27,8 +27,7 @@ public class WebConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/").permitAll()
-                        .requestMatchers(LoginController.LOGIN_PATH).permitAll()
+                        .requestMatchers(WHITE_LIST_URL).permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -42,4 +41,10 @@ public class WebConfig {
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder(12);
     }
+
+    private static final String[] WHITE_LIST_URL = {
+            "/",
+            LoginController.LOGIN_PATH,
+            LoginController.LOGIN_PATH+"/login"
+    };
 }

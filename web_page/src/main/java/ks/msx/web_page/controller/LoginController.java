@@ -3,14 +3,23 @@ package ks.msx.web_page.controller;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import ks.msx.web_page.entity.UserDTO;
+import ks.msx.web_page.entity.UserEntity;
 import ks.msx.web_page.repository.UserRepository;
 import ks.msx.web_page.utility.JwtUtility;
 import lombok.AllArgsConstructor;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import java.awt.*;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -32,11 +41,27 @@ public class LoginController {
 
 
 
-    @PostMapping(LOGIN_PATH + "/login")
-    public void logUser(@RequestBody UserDTO userDTO, HttpServletResponse response) throws IOException {
-        String token = jwtUtility.generateToken(userRepository.findUserByUsername(userDTO.getUsername()).orElseThrow());
+    @PostMapping(path=LOGIN_PATH + "/login", consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
+    public void logUser(@RequestParam(name = "username")String username,
+                        @RequestParam(name = "password")String password,
+                        HttpServletResponse response) throws IOException {
+        authenticate(username, password);
+        String token = jwtUtility.generateToken(userRepository.findUserByUsername(username).orElseThrow());
         Cookie cookie = new Cookie("AUTHORIZATION", URLEncoder.encode(token, StandardCharsets.UTF_8));
         response.addCookie(cookie);
-        response.sendRedirect("/");
+        response.sendRedirect(LOGIN_PATH+"/confirm");
+    }
+
+    @GetMapping(LOGIN_PATH+"/confirm")
+    public ResponseEntity<String> confirmToken(){
+        return ResponseEntity.ok().body(SecurityContextHolder.getContext().getAuthentication().getName());
+    }
+
+    private void authenticate(String username, String password){
+        try {
+            SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(username, password));
+        }catch (Exception e){
+            e.getStackTrace();
+        }
     }
 }
