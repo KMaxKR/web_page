@@ -2,6 +2,7 @@ package ks.msx.web_page.config;
 
 import ks.msx.web_page.config.entry_point.JwtEntryPoint;
 import ks.msx.web_page.config.filter.JwtFilter;
+import ks.msx.web_page.controller.LoginController;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,6 +28,7 @@ public class WebConfig {
                 .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/").permitAll()
+                        .requestMatchers(LoginController.LOGIN_PATH).permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

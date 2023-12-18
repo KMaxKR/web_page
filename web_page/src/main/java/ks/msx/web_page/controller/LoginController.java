@@ -11,22 +11,32 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
 @Controller
 @AllArgsConstructor
 public class LoginController {
     private final JwtUtility jwtUtility;
     private final UserRepository userRepository;
-    private final static String LOGIN_PATH = "/authentication";
+    public final static String LOGIN_PATH = "/authentication";
+
+
 
     @GetMapping(LOGIN_PATH)
-    public String returnLoginPage(){
+    public String returnLoginPage(HttpServletResponse response){
+        response.setStatus(200);
         return "log_page";
     }
 
+
+
     @PostMapping(LOGIN_PATH + "/login")
-    public void logUser(@RequestBody UserDTO userDTO, HttpServletResponse response){
-        String token = null;
-        Cookie cookie = new Cookie("AUTHORIZATION", token);
+    public void logUser(@RequestBody UserDTO userDTO, HttpServletResponse response) throws IOException {
+        String token = jwtUtility.generateToken(userRepository.findUserByUsername(userDTO.getUsername()).orElseThrow());
+        Cookie cookie = new Cookie("AUTHORIZATION", URLEncoder.encode(token, StandardCharsets.UTF_8));
         response.addCookie(cookie);
+        response.sendRedirect("/");
     }
 }

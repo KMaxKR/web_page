@@ -12,9 +12,15 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
+
+@Component
 @AllArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
     private final JwtUtility jwtUtility;
@@ -23,40 +29,42 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-        String token = "";
-        String username = "";
-
+        String requestToken = null;
         Cookie[] cookies = request.getCookies();
-        if (cookies != null){
-            for (Cookie cookie:cookies){
-                if (cookie.getName().equals("AUTHORIZATION")){
-                    token = cookie.getValue();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (Objects.equals(cookie.getName(), "AUTHORIZATION")) {
+                    requestToken = URLDecoder.decode(cookie.getValue(), StandardCharsets.UTF_8);
                 }
             }
         }
 
-        if (token != null && token.startsWith("BEARER ")){
-            token = token.substring(7);
-            try{
+        String username = null;
+        String token = null;
+
+        if (requestToken != null && requestToken.startsWith("Bearer ")){
+            token = requestToken.substring(7);
+            try {
                 username = jwtUtility.getUsernameFromToken(token);
             }catch (Exception e){
+                System.out.println("Token expirated");
                 e.getStackTrace();
             }
         }else {
-            System.out.println("Token does not start with Bearer");
+            System.out.println("Warn Token does not start with Bearer");
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null){
             UserDetails userDetails = userService.loadUserByUsername(username);
-            if (!jwtUtility.isValidToken(token)){
+            if (!jwtUtility.isValidToken(token)) {
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
                 SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-                System.out.println(usernamePasswordAuthenticationToken);
+                System.out.println(SecurityContextHolder.getContext().getAuthentication().getDetails());
             }
         }
-
         filterChain.doFilter(request, response);
     }
 }
