@@ -31,8 +31,6 @@ public class LoginController {
     private final UserRepository userRepository;
     public final static String LOGIN_PATH = "/authentication";
 
-
-
     @GetMapping(LOGIN_PATH)
     public String returnLoginPage(HttpServletResponse response){
         response.setStatus(200);
@@ -49,13 +47,10 @@ public class LoginController {
         String token = jwtUtility.generateToken(userRepository.findUserByUsername(username).orElseThrow());
         Cookie cookie = new Cookie("AUTHORIZATION", URLEncoder.encode(token, StandardCharsets.UTF_8));
         response.addCookie(cookie);
-        response.sendRedirect(LOGIN_PATH+"/confirm");
+        response.sendRedirect("/");
     }
 
-    @GetMapping(LOGIN_PATH+"/confirm")
-    public ResponseEntity<String> confirmToken(){
-        return ResponseEntity.ok().body(SecurityContextHolder.getContext().getAuthentication().getName());
-    }
+
 
     private void authenticate(String username, String password){
         try {

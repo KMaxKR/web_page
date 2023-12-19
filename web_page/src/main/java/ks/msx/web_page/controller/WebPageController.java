@@ -1,10 +1,17 @@
 package ks.msx.web_page.controller;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 @AllArgsConstructor
 public class WebPageController {
-    // TODO: 18.12.2023  redirect to main page and other....
+
+    @GetMapping("/")
+    public String returnMainPage(HttpServletResponse response){
+        response.setStatus(200);
+        return "index";
+    }
 }
