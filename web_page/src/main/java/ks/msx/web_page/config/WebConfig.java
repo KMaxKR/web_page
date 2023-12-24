@@ -44,7 +44,7 @@ public class WebConfig {
 
     private static final String[] WHITE_LIST_URL = {
             "/",
-            LoginController.LOGIN_PATH,
-            LoginController.LOGIN_PATH+"/login"
+            LoginController.PATH,
+            LoginController.PATH+"/login"
     };
 }
