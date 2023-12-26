@@ -28,7 +28,8 @@ public class WebConfig {
                 .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(WHITE_LIST_URL).permitAll()
-                        .anyRequest().authenticated()
+                        .requestMatchers(RESTRICTED_AREA_LIST).authenticated()
+                        .anyRequest().permitAll()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(exc -> exc.authenticationEntryPoint(jwtEntryPoint))
@@ -45,6 +46,12 @@ public class WebConfig {
     private static final String[] WHITE_LIST_URL = {
             "/",
             LoginController.PATH,
-            LoginController.PATH+"/login"
+            LoginController.PATH+"/login",
+            LoginController.PATH+"/reg",
+            LoginController.PATH+"/registration"
+    };
+    private static final String[] RESTRICTED_AREA_LIST = {
+            "/test",
+            "/tes"
     };
 }

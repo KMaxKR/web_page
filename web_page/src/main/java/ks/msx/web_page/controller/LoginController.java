@@ -35,13 +35,14 @@ public class LoginController {
 
 
 
-    @PostMapping(path=PATH + "/login", consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
+    @PostMapping(PATH + "/login")
     public void logUser(@RequestParam(name = "username")String username,
                         @RequestParam(name = "password")String password,
                         HttpServletResponse response) throws IOException {
         authenticate(username, password);
         String token = jwtUtility.generateToken(userRepository.findUserByUsername(username).orElseThrow());
         Cookie cookie = new Cookie("AUTHORIZATION", URLEncoder.encode(token, StandardCharsets.UTF_8));
+        cookie.setMaxAge(1000);
         response.addCookie(cookie);
         response.sendRedirect("/");
     }
@@ -64,7 +65,6 @@ public class LoginController {
         response.setStatus(200);
         response.sendRedirect("/");
     }
-
 
     private void authenticate(String username, String password){
         try {
