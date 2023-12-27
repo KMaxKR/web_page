@@ -28,7 +28,7 @@ public class WebConfig {
                 .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(WHITE_LIST_URL).permitAll()
-                        .requestMatchers(RESTRICTED_AREA_LIST).authenticated()
+                        .requestMatchers(RESTRICTED_AREA_LIST_URL).authenticated()
                         .anyRequest().permitAll()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -50,7 +50,7 @@ public class WebConfig {
             LoginController.PATH+"/reg",
             LoginController.PATH+"/registration"
     };
-    private static final String[] RESTRICTED_AREA_LIST = {
+    private static final String[] RESTRICTED_AREA_LIST_URL = {
             "/test",
             "/tes"
     };
