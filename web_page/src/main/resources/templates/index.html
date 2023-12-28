@@ -735,20 +735,19 @@ body {
 <section id="food-menu">
     <h2 class="food-menu-heading">Food Menu</h2>
     <div class="food-menu-container container">
-        <div class="food-menu-item">
+        <div class="food-menu-item"> <!-- th:each--->
             <div class="food-img">
-                <img src="https://i.postimg.cc/wTLMsvSQ/food-menu1.jpg" alt="" />
+                <img src="https://i.postimg.cc/wTLMsvSQ/food-menu1.jpg" alt="" /> <!-- th:src--->
             </div>
             <div class="food-description">
-                <h2 class="food-titile">Food Menu Item 1</h2>
-                <p>
+                <h2 class="food-titile">Food Menu Item 1</h2> <!-- th:text--->
+                <p> <!-- th:text--->
                     Lorem ipsum dolor sit amet consectetur adipisicing elit. Non,
                     quae.
                 </p>
-                <p class="food-price">Price: &#8377; 250</p>
+                <p class="food-price">Price: &#8377; 250 <!-- th:text--->
             </div>
         </div>
-
         <div class="food-menu-item">
             <div class="food-img">
                 <img
