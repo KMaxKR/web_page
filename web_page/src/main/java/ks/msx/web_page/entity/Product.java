@@ -12,13 +12,13 @@ import lombok.NoArgsConstructor;
 @Builder
 @Entity
 @Table(name = "product_menu")
-public class FoodMenuEntity {
+public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "product_name")
-    private String product_name;
+    private String name;
 
     @Column(name = "description")
     private String description;
