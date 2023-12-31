@@ -1,6 +1,7 @@
 package ks.msx.web_page.service;
 
 import ks.msx.web_page.entity.Product;
+import ks.msx.web_page.entity.ProductDTO;
 import ks.msx.web_page.repository.ProductRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,24 @@ public class ProductService {
     }
 
     public List<Product> getProductsOrderedByPrice(String order){
-        return getAllProducts().stream().sorted().toList();
+        if(order.equals("ASC")) {
+            return productRepository.findByOrderByPriceAsc();
+        }else if (order.equals("DESC")){
+            return productRepository.findByOrderByPriceDesc();
+        }else {
+            return getAllProducts();
+        }
+    }
+
+    public void addProduct(ProductDTO dto){
+        productRepository.save(
+          Product.builder()
+                  .name(dto.getName())
+                  .description(dto.getDescription())
+                  .price(dto.getPrice())
+                  .img(dto.getImg())
+                  .type(dto.getType())
+                  .build()
+        );
     }
 }

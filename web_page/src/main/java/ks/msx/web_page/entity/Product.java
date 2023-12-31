@@ -27,7 +27,7 @@ public class Product {
     private double price;
 
     @Column(name = "img")
-    private byte[] img;
+    private String img;  //link to img
 
     @Column(name = "type")
     @Enumerated(EnumType.STRING)
