@@ -1,4 +1,4 @@
-<html lang="en">
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -21,6 +21,7 @@
 
 body {
   font-family: "Poppins", sans-serif;
+  background: black;
 }
 
 /* ///////////..utility classes../////////// */
@@ -66,8 +67,8 @@ body {
   box-shadow: 0px 5px 10px 0px #aaa;
   position: fixed;
   width: 100%;
-  background: #fff;
-  color: #000;
+  background: black;
+  color: white;
   opacity: 0.85;
   height: 50px;
   z-index: 12;
@@ -94,7 +95,7 @@ body {
 
 .menu-items a {
   text-decoration: none;
-  color: #444;
+  color: #a19f9a;
   font-weight: 500;
   transition: color 0.3s ease-in-out;
 }
@@ -142,7 +143,7 @@ body {
 
 #about {
   padding: 50px 0;
-  background: #f5f5f7;
+  background: black;
 }
 
 .about-wrapper {
@@ -179,6 +180,7 @@ body {
 }
 
 .about-text {
+  color: white;
   flex: 1 1 400px;
   padding: 30px;
   margin: auto;
@@ -213,7 +215,7 @@ body {
   font-weight: 400;
   margin-bottom: 40px;
   text-transform: uppercase;
-  color: #555;
+  color: white;
 }
 
 .food-container {
@@ -288,7 +290,7 @@ body {
   text-align: center;
   font-size: 3.4rem;
   font-weight: 400;
-  color: #666;
+  color: white;
 }
 
 .food-menu-container {
@@ -314,13 +316,14 @@ body {
 }
 
 .food-description {
+  color: white;
   margin: auto 1.5rem;
 }
 
 .font-title {
   font-size: 1.8rem;
   font-weight: 400;
-  color: #444;
+  color: white;
 }
 
 .food-description p {
@@ -338,14 +341,14 @@ body {
 
 #testimonials {
   padding: 5rem 0;
-  background: rgba(243, 243, 243);
+  background: black;
 }
 
 .testimonial-title {
   text-align: center;
   font-size: 2.8rem;
   font-weight: 400;
-  color: #555;
+  color: white;
 }
 
 .testimonial-container {
@@ -383,7 +386,7 @@ body {
 
 #contact {
   padding: 5rem 0;
-  background: rgb(226, 226, 226);
+  background: #1c1916;
 }
 
 .contact-container {
@@ -447,8 +450,8 @@ body {
 
 #footer h2 {
   text-align: center;
-  font-size: 1.8rem;
-  padding: 2.6rem;
+  font-size: 1.2rem;
+  padding: 2.1rem;
   font-weight: 500;
   color: #fff;
   background: rgb(65, 65, 65);
@@ -735,85 +738,17 @@ body {
 <section id="food-menu">
     <h2 class="food-menu-heading">Food Menu</h2>
     <div class="food-menu-container container">
-        <div class="food-menu-item"> <!-- th:each--->
+        <div class="food-menu-item" th:each="product : ${product}"> <!-- th:each--->
             <div class="food-img">
-                <img src="https://i.postimg.cc/wTLMsvSQ/food-menu1.jpg" alt="" /> <!-- th:src--->
+                <img th:src="${product.img}" alt="" /> <!-- th:src--->
             </div>
             <div class="food-description">
-                <h2 class="food-titile">Food Menu Item 1</h2> <!-- th:text--->
-                <p> <!-- th:text--->
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Non,
-                    quae.
+                <h2 class="food-titile" th:text="${product.name}"></h2> <!-- th:text--->
+                <p th:text="${product.description}"> <!-- th:text--->
                 </p>
-                <p class="food-price">Price: &#8377; 250 <!-- th:text--->
-            </div>
-        </div>
-        <div class="food-menu-item">
-            <div class="food-img">
-                <img
-                        src="https://i.postimg.cc/sgzXPzzd/food-menu2.jpg"
-                        alt="error"
-                />
-            </div>
-            <div class="food-description">
-                <h2 class="food-titile">Food Menu Item 2</h2>
-                <p>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Non,
-                    quae.
+                <p class="food-price">Price:</p>
+                <p class="food-price" th:text="${product.price}">  <!-- th:text--->
                 </p>
-                <p class="food-price">Price: &#8377; 250</p>
-            </div>
-        </div>
-        <div class="food-menu-item">
-            <div class="food-img">
-                <img src="https://i.postimg.cc/8zbCtYkF/food-menu3.jpg" alt="" />
-            </div>
-            <div class="food-description">
-                <h2 class="food-titile">Food Menu Item 3</h2>
-                <p>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Non,
-                    quae.
-                </p>
-                <p class="food-price">Price: &#8377; 250</p>
-            </div>
-        </div>
-        <div class="food-menu-item">
-            <div class="food-img">
-                <img src="https://i.postimg.cc/Yq98p5Z7/food-menu4.jpg" alt="" />
-            </div>
-            <div class="food-description">
-                <h2 class="food-titile">Food Menu Item 4</h2>
-                <p>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Non,
-                    quae.
-                </p>
-                <p class="food-price">Price: &#8377; 250</p>
-            </div>
-        </div>
-        <div class="food-menu-item">
-            <div class="food-img">
-                <img src="https://i.postimg.cc/KYnDqxkP/food-menu5.jpg" alt="" />
-            </div>
-            <div class="food-description">
-                <h2 class="food-titile">Food Menu Item 5</h2>
-                <p>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Non,
-                    quae.
-                </p>
-                <p class="food-price">Price: &#8377; 250</p>
-            </div>
-        </div>
-        <div class="food-menu-item">
-            <div class="food-img">
-                <img src="https://i.postimg.cc/Jnxc8xQt/food-menu6.jpg" alt="" />
-            </div>
-            <div class="food-description">
-                <h2 class="food-titile">Food Menu Item 6</h2>
-                <p>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Non,
-                    quae.
-                </p>
-                <p class="food-price">Price: &#8377; 250</p>
             </div>
         </div>
     </div>

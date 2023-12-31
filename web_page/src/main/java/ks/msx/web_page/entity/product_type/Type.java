@@ -5,8 +5,9 @@ import lombok.Getter;
 
 @AllArgsConstructor
 public enum Type {
-    TYPE1("TYPE1"),
-    TYPE2("TYPE2");
+    BREAKFAST("BREAKFAST"),
+    LUNCH("LUNCH"),
+    DINNER("DINNER");
 
     @Getter
     public final String getType;

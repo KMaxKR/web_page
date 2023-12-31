@@ -7,7 +7,6 @@ import ks.msx.web_page.repository.UserRepository;
 import ks.msx.web_page.service.UserService;
 import ks.msx.web_page.utility.JwtUtility;
 import lombok.AllArgsConstructor;
-import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;

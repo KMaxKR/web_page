@@ -1,6 +1,7 @@
 package ks.msx.web_page.entity;
 
 import jakarta.persistence.*;
+import ks.msx.web_page.entity.product_type.Type;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -31,5 +32,5 @@ public class Product {
 
     @Column(name = "type")
     @Enumerated(EnumType.STRING)
-    private String type;
+    private Type type;
 }
