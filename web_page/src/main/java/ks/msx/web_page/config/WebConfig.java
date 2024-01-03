@@ -33,7 +33,15 @@ public class WebConfig {
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(exc -> exc.authenticationEntryPoint(jwtEntryPoint))
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .formLogin(f -> f
+                        .loginPage(LoginController.PATH)
+                        .defaultSuccessUrl("/")
+                )
+                .oauth2Login(l -> l
+                        .loginPage("/log/oauth2")
+                        .defaultSuccessUrl("/")
+                );
         return http.build();
     }
 
@@ -48,10 +56,11 @@ public class WebConfig {
             LoginController.PATH,
             LoginController.PATH+"/login",
             LoginController.PATH+"/reg",
-            LoginController.PATH+"/registration"
+            LoginController.PATH+"/registration",
+            "/log/oauth2"
     };
     private static final String[] RESTRICTED_AREA_LIST_URL = {
             "/test",
-            "/tes"
+            "/test1"
     };
 }
