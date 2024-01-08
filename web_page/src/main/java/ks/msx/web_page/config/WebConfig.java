@@ -14,6 +14,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.config.oauth2.client.CommonOAuth2Provider;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.InMemoryOAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
@@ -25,6 +27,7 @@ import org.springframework.security.oauth2.client.web.HttpSessionOAuth2Authoriza
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 import java.util.List;
 import java.util.Objects;
@@ -40,7 +43,9 @@ public class WebConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable)
+                .csrf(c -> c
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                )
                 .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(WHITE_LIST_URL).permitAll()
@@ -56,6 +61,7 @@ public class WebConfig {
                 )
                 .oauth2Login(l -> l
                         .loginPage("/log/oauth2")
+                        //.defaultSuccessUrl("/success/log")
                         .defaultSuccessUrl("/")
                         .authorizationEndpoint(end -> end.baseUri("/oauth2/authorize-client")
                                 .authorizationRequestRepository(authorizationRequestRepository()))
@@ -104,7 +110,12 @@ public class WebConfig {
         return new InMemoryClientRegistrationRepository(registrations);
     }
 
-    private static List<String> clients = List.of("google");
+    @Bean
+    public OAuth2AuthorizedClientService authorizedClientService() {
+        return new InMemoryOAuth2AuthorizedClientService(clientRegistrationRepository());
+    }
+
+    private static final List<String> clients = List.of("google");
 
     private static final String[] WHITE_LIST_URL = {
             "/",
@@ -112,7 +123,9 @@ public class WebConfig {
             LoginController.PATH+"/login",
             LoginController.PATH+"/reg",
             LoginController.PATH+"/registration",
-            "/log/oauth2"
+            "/log/oauth2",
+            "/success/log",
+            "/test/google"
     };
     private static final String[] RESTRICTED_AREA_LIST_URL = {
             "/test",

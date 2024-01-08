@@ -9,10 +9,12 @@ import ks.msx.web_page.repository.UserRepository;
 import ks.msx.web_page.service.UserService;
 import ks.msx.web_page.utility.JwtUtility;
 import lombok.AllArgsConstructor;
-import org.hibernate.mapping.Resolvable;
 import org.springframework.core.ResolvableType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.stereotype.Controller;
@@ -20,6 +22,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.thymeleaf.util.StringUtils;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -34,6 +37,7 @@ public class LoginController {
     private final UserRepository userRepository;
     private final UserService userService;
     private final ClientRegistrationRepository clientRegistrationRepository;
+    private final OAuth2AuthorizedClientService authorizedClientService;
     public final static String PATH = "/authentication";
     public final static String OAUTH_PATH = "/oauth2/authorize-client";
     Map<String, String> oauth2RegistrationUrls = new HashMap<>();
@@ -87,10 +91,27 @@ public class LoginController {
         if (type != ResolvableType.NONE && ClientRegistration.class.isAssignableFrom(type.resolveGenerics()[0])){
             clientRegistrations = (Iterable<ClientRegistration>) clientRegistrationRepository;
         }
-        clientRegistrations.forEach(registration -> oauth2RegistrationUrls.put(registration.getClientName(), oauth2RegistrationUrls + "/" + registration.getRegistrationId()));
+        clientRegistrations.forEach(registration -> oauth2RegistrationUrls.put(registration.getClientName(), OAUTH_PATH + "/" + registration.getRegistrationId()));
         model.addAttribute("urls", oauth2RegistrationUrls);
         return "log_oauth";
     }
+
+    @GetMapping("/success/log")
+    public String getUserInfo(OAuth2AuthenticationToken authentication, HttpServletResponse response){
+        OAuth2AuthorizedClient client = authorizedClientService.loadAuthorizedClient(authentication.getAuthorizedClientRegistrationId(), authentication.getName());
+        String userInfoEndpointUri = client.getClientRegistration()
+                .getProviderDetails()
+                .getUserInfoEndpoint()
+                .getUri();
+        if (!StringUtils.isEmpty(userInfoEndpointUri)){
+            Cookie cookie = new Cookie("AUTHORIZATION", URLEncoder.encode(client.getAccessToken().getTokenValue(), StandardCharsets.UTF_8));
+            response.addCookie(cookie);
+        }
+        return "index";
+    }
+
+
+
 
     private void authenticate(String username, String password){
         try {
