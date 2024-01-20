@@ -4,6 +4,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import ks.msx.web_page.entity.UserDTO;
 import ks.msx.web_page.repository.UserRepository;
 import ks.msx.web_page.service.UserService;
@@ -29,6 +30,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @Controller
 @AllArgsConstructor
@@ -43,40 +45,38 @@ public class LoginController {
     Map<String, String> oauth2RegistrationUrls = new HashMap<>();
 
     @GetMapping(PATH)
-    public String returnLoginPage(HttpServletResponse response){
+    public String returnLoginPage(HttpServletResponse response) {
         response.setStatus(200);
         return "log_page";
     }
 
 
-
     @PostMapping(PATH + "/login")
-    public void logUser(@RequestParam(name = "username")String username,
-                        @RequestParam(name = "password")String password,
-                        HttpServletResponse response,
-                        HttpServletRequest request) throws IOException, ServletException {
-        authenticate(username, password);
+    public void logUser(@RequestParam(name = "username") String username,
+                        @RequestParam(name = "password") String password,
+                        HttpServletResponse response) throws IOException{
         String token = jwtUtility.generateToken(userRepository.findUserByUsername(username).orElseThrow());
+        authenticate(username, password);
+
         Cookie cookie = new Cookie("AUTHORIZATION", URLEncoder.encode(token, StandardCharsets.UTF_8));
-        cookie.setMaxAge(1000);
+        cookie.setMaxAge(10000000);
         response.addCookie(cookie);
-        request.login(username, password);
         response.sendRedirect("/");
     }
 
-    @GetMapping(PATH+"/reg")
-    public String returnRegistrationPage(HttpServletResponse response){
+    @GetMapping(PATH + "/reg")
+    public String returnRegistrationPage(HttpServletResponse response) {
         response.setStatus(200);
         return "reg_page";
     }
 
-    @PostMapping(PATH+"/registration")
-    public void registerUser(@RequestParam(name = "username")String username,
-                            @RequestParam(name = "password")String password,
-                            HttpServletResponse response) throws IOException {
+    @PostMapping(PATH + "/registration")
+    public void registerUser(@RequestParam(name = "username") String username,
+                             @RequestParam(name = "password") String password,
+                             HttpServletResponse response) throws IOException {
         userService.registerUser(UserDTO.builder()
-                        .username(username)
-                        .password(password)
+                .username(username)
+                .password(password)
                 .build());
         authenticate(username, password);
         response.setStatus(200);
@@ -84,11 +84,11 @@ public class LoginController {
     }
 
     @GetMapping("/log/oauth2")
-    public String returnLoginPageOauth2(Model model){
+    public String returnLoginPageOauth2(Model model) {
         Iterable<ClientRegistration> clientRegistrations = null;
         ResolvableType type = ResolvableType.forInstance(clientRegistrationRepository)
-                        .as(Iterable.class);
-        if (type != ResolvableType.NONE && ClientRegistration.class.isAssignableFrom(type.resolveGenerics()[0])){
+                .as(Iterable.class);
+        if (type != ResolvableType.NONE && ClientRegistration.class.isAssignableFrom(type.resolveGenerics()[0])) {
             clientRegistrations = (Iterable<ClientRegistration>) clientRegistrationRepository;
         }
         clientRegistrations.forEach(registration -> oauth2RegistrationUrls.put(registration.getClientName(), OAUTH_PATH + "/" + registration.getRegistrationId()));
@@ -97,13 +97,13 @@ public class LoginController {
     }
 
     @GetMapping("/success/log")
-    public String getUserInfo(OAuth2AuthenticationToken authentication, HttpServletResponse response){
+    public String getUserInfo(OAuth2AuthenticationToken authentication, HttpServletResponse response) {
         OAuth2AuthorizedClient client = authorizedClientService.loadAuthorizedClient(authentication.getAuthorizedClientRegistrationId(), authentication.getName());
         String userInfoEndpointUri = client.getClientRegistration()
                 .getProviderDetails()
                 .getUserInfoEndpoint()
                 .getUri();
-        if (!StringUtils.isEmpty(userInfoEndpointUri)){
+        if (!StringUtils.isEmpty(userInfoEndpointUri)) {
             Cookie cookie = new Cookie("AUTHORIZATION", URLEncoder.encode(client.getAccessToken().getTokenValue(), StandardCharsets.UTF_8));
             response.addCookie(cookie);
         }
@@ -111,12 +111,30 @@ public class LoginController {
     }
 
 
+    @GetMapping(PATH+"/logout")
+    public void logoutUser(HttpServletResponse response, HttpServletRequest request) throws IOException {
+        HttpSession session = request.getSession(false);
+        if (request.isRequestedSessionIdValid() && session != null) {
+            session.invalidate();
+        }
+        clearCookie(request, response);
+        Cookie cookie = new Cookie("AUTHORIZATION", null);
+        response.addCookie(cookie);
+        response.sendRedirect("/");
+    }
 
+    private void clearCookie(HttpServletRequest request, HttpServletResponse response){
+        Cookie[] cookies = request.getCookies();
+        for (Cookie cookie: cookies){
+            cookie.setMaxAge(0);
+            response.addCookie(cookie);
+        }
+    }
 
-    private void authenticate(String username, String password){
+    private void authenticate(String username, String password) {
         try {
             SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(username, password));
-        }catch (Exception e){
+        } catch (Exception e) {
             e.getStackTrace();
         }
     }

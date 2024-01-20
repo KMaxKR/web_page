@@ -43,9 +43,7 @@ public class WebConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(c -> c
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                )
+                .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(WHITE_LIST_URL).permitAll()
@@ -57,7 +55,7 @@ public class WebConfig {
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .formLogin(f -> f
                         .loginPage(LoginController.PATH)
-                        .defaultSuccessUrl("/")
+                        .defaultSuccessUrl(LoginController.PATH+"/login")
                 )
                 .oauth2Login(l -> l
                         .loginPage("/log/oauth2")
@@ -86,7 +84,7 @@ public class WebConfig {
         return new DefaultAuthorizationCodeTokenResponseClient();
     }
 
-    private static String CLIENT_PROPERTY_KEY = "spring.security.oauth2.client.registration.";
+    private static final String CLIENT_PROPERTY_KEY = "spring.security.oauth2.client.registration.";
 
     private ClientRegistration getRegistration(String client){
         String clientId = env.getProperty(CLIENT_PROPERTY_KEY + client + ".client-id");
@@ -123,6 +121,7 @@ public class WebConfig {
             LoginController.PATH+"/login",
             LoginController.PATH+"/reg",
             LoginController.PATH+"/registration",
+            LoginController.PATH+"/logout",
             "/log/oauth2",
             "/success/log",
             "/test/google"

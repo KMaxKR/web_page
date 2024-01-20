@@ -20,7 +20,7 @@ public class JwtUtility {
                     .setSubject(user.getUsername())
                     .claim("role", user.getRole())
                     .setIssuedAt(new Date())
-                    .setExpiration(new Date(System.currentTimeMillis() + 60*60*1000000L))
+                    .setExpiration(new Date(System.currentTimeMillis() + 60*60*100000L))
                     .signWith(SignatureAlgorithm.HS256, key)
                     .compact();
         }catch (Exception e){
@@ -29,11 +29,8 @@ public class JwtUtility {
         return "Bearer " + token;
     }
 
-    private Claims getClaim(String token){
-        return Jwts.parser()
-                .setSigningKey(key)
-                .parseClaimsJws(token)
-                .getBody();
+    public Claims getClaim(String token){
+        return Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody();
     }
 
     public String getUsernameFromToken(String token){
@@ -41,6 +38,7 @@ public class JwtUtility {
     }
 
     public boolean isValidToken(String token){
-        return getClaim(token).getExpiration().before(new Date());
+        final Date expiration = getClaim(token).getExpiration();
+        return expiration.before(new Date());
     }
 }
