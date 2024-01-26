@@ -27,7 +27,6 @@ import org.springframework.security.oauth2.client.web.HttpSessionOAuth2Authoriza
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 import java.util.List;
 import java.util.Objects;
@@ -59,8 +58,7 @@ public class WebConfig {
                 )
                 .oauth2Login(l -> l
                         .loginPage("/log/oauth2")
-                        //.defaultSuccessUrl("/success/log")
-                        .defaultSuccessUrl("/")
+                        .defaultSuccessUrl("/success/log")
                         .authorizationEndpoint(end -> end.baseUri("/oauth2/authorize-client")
                                 .authorizationRequestRepository(authorizationRequestRepository()))
                         .tokenEndpoint(t -> t.accessTokenResponseClient(accessTokenResponseClient()))

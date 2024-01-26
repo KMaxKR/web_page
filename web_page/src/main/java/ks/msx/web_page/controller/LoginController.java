@@ -1,7 +1,5 @@
 package ks.msx.web_page.controller;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -12,25 +10,21 @@ import ks.msx.web_page.utility.JwtUtility;
 import lombok.AllArgsConstructor;
 import org.springframework.core.ResolvableType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.thymeleaf.util.StringUtils;
 
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 @Controller
 @AllArgsConstructor
@@ -40,6 +34,9 @@ public class LoginController {
     private final UserService userService;
     private final ClientRegistrationRepository clientRegistrationRepository;
     private final OAuth2AuthorizedClientService authorizedClientService;
+    // PATH: http://localhost:8090/login/oauth2/code/google
+
+
     public final static String PATH = "/authentication";
     public final static String OAUTH_PATH = "/oauth2/authorize-client";
     Map<String, String> oauth2RegistrationUrls = new HashMap<>();
@@ -103,17 +100,9 @@ public class LoginController {
     }
 
     @GetMapping("/success/log")
-    public String getUserInfo(OAuth2AuthenticationToken authentication, HttpServletResponse response) {
-        OAuth2AuthorizedClient client = authorizedClientService.loadAuthorizedClient(authentication.getAuthorizedClientRegistrationId(), authentication.getName());
-        String userInfoEndpointUri = client.getClientRegistration()
-                .getProviderDetails()
-                .getUserInfoEndpoint()
-                .getUri();
-        if (!StringUtils.isEmpty(userInfoEndpointUri)) {
-            Cookie cookie = new Cookie("AUTHORIZATION", URLEncoder.encode(client.getAccessToken().getTokenValue(), StandardCharsets.UTF_8));
-            response.addCookie(cookie);
-        }
-        return "index";
+    public void getUserInfo(@AuthenticationPrincipal OAuth2User user, HttpServletResponse response) throws IOException {
+        System.out.println(user);
+        response.sendRedirect("/");
     }
 
 
