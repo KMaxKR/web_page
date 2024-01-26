@@ -54,13 +54,17 @@ public class LoginController {
     @PostMapping(PATH + "/login")
     public void logUser(@RequestParam(name = "username") String username,
                         @RequestParam(name = "password") String password,
-                        HttpServletResponse response) throws IOException{
+                        HttpServletResponse response,
+                        HttpServletRequest request) throws IOException{
         String token = jwtUtility.generateToken(userRepository.findUserByUsername(username).orElseThrow());
         authenticate(username, password);
 
-        Cookie cookie = new Cookie("AUTHORIZATION", URLEncoder.encode(token, StandardCharsets.UTF_8));
-        cookie.setMaxAge(10000000);
-        response.addCookie(cookie);
+//        Cookie cookie = new Cookie("AUTHORIZATION", URLEncoder.encode(token, StandardCharsets.UTF_8));
+//        cookie.setMaxAge(10000000);
+//        response.addCookie(cookie);
+
+        HttpSession session = request.getSession();
+        session.setAttribute("AUTHORIZATION", token);
         response.sendRedirect("/");
     }
 
@@ -69,6 +73,8 @@ public class LoginController {
         response.setStatus(200);
         return "reg_page";
     }
+
+
 
     @PostMapping(PATH + "/registration")
     public void registerUser(@RequestParam(name = "username") String username,
@@ -117,18 +123,7 @@ public class LoginController {
         if (request.isRequestedSessionIdValid() && session != null) {
             session.invalidate();
         }
-        clearCookie(request, response);
-        Cookie cookie = new Cookie("AUTHORIZATION", null);
-        response.addCookie(cookie);
         response.sendRedirect("/");
-    }
-
-    private void clearCookie(HttpServletRequest request, HttpServletResponse response){
-        Cookie[] cookies = request.getCookies();
-        for (Cookie cookie: cookies){
-            cookie.setMaxAge(0);
-            response.addCookie(cookie);
-        }
     }
 
     private void authenticate(String username, String password) {
