@@ -44,7 +44,7 @@ public class JwtFilter extends OncePerRequestFilter {
         try{
             requestToken = request.getSession().getAttribute("AUTHORIZATION").toString();
         }catch (Exception e){
-            if (tk != null || !tk.equals("")){
+            if (tk != null){
                 requestToken = tk;
             }
             e.getStackTrace();
