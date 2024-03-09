@@ -13,6 +13,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -100,8 +101,7 @@ public class LoginController {
     }
 
     @GetMapping("/success/log")
-    public void getUserInfo(@AuthenticationPrincipal OAuth2User user, HttpServletResponse response) throws IOException {
-        System.out.println(user);
+    public void getUserInfo(OAuth2AuthenticationToken user, HttpServletResponse response) throws IOException {
         response.sendRedirect("/");
     }
 
